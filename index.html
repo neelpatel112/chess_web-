@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classic Chess Game</title>
+    <title>Enhanced Chess Game</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-chess-board"></i> Classic Chess</h1>
-            <p class="subtitle">A timeless game of strategy and skill</p>
+            <h1><i class="fas fa-chess-board"></i> Enhanced Chess</h1>
+            <p class="subtitle">Professional chess with advanced features</p>
+            <div class="header-badges">
+                <span class="badge"><i class="fas fa-robot"></i> AI Opponent</span>
+                <span class="badge"><i class="fas fa-music"></i> Sound Effects</span>
+                <span class="badge"><i class="fas fa-save"></i> Auto-Save</span>
+            </div>
         </header>
 
         <div class="game-container">
@@ -21,25 +27,45 @@
                     <h3><i class="fas fa-chess-king"></i> White</h3>
                     <div class="player-clock" id="white-clock">15:00</div>
                     <div class="captured-pieces" id="white-captured"></div>
+                    <div class="player-stats">
+                        <div class="stat">
+                            <span class="stat-label">Material:</span>
+                            <span class="stat-value" id="white-material">39</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Moves:</span>
+                            <span class="stat-value" id="white-moves">0</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="game-controls">
-                    <button id="new-game" class="btn btn-primary">
-                        <i class="fas fa-plus-circle"></i> New Game
-                    </button>
-                    <button id="flip-board" class="btn">
-                        <i class="fas fa-sync-alt"></i> Flip Board
-                    </button>
-                    <button id="undo-move" class="btn">
-                        <i class="fas fa-undo"></i> Undo Move
-                    </button>
+                    <div class="control-group">
+                        <button id="new-game" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> New Game
+                        </button>
+                        <button id="flip-board" class="btn">
+                            <i class="fas fa-sync-alt"></i> Flip Board
+                        </button>
+                        <button id="undo-move" class="btn">
+                            <i class="fas fa-undo"></i> Undo
+                        </button>
+                    </div>
+                    
                     <div class="game-status">
-                        <h4>Game Status</h4>
+                        <h4><i class="fas fa-info-circle"></i> Game Status</h4>
                         <p id="status-message">White to move</p>
-                        <div class="move-history">
-                            <h4>Move History</h4>
-                            <div id="move-history"></div>
+                        <div class="game-evaluation">
+                            <div class="eval-bar">
+                                <div class="eval-fill" id="eval-fill"></div>
+                            </div>
+                            <div class="eval-score" id="eval-score">+0.0</div>
                         </div>
+                    </div>
+                    
+                    <div class="move-history">
+                        <h4><i class="fas fa-history"></i> Move History</h4>
+                        <div id="move-history"></div>
                     </div>
                 </div>
             </div>
@@ -60,6 +86,15 @@
                 <div class="coordinates coordinates-bottom">
                     <span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span>
                 </div>
+                
+                <div class="board-controls">
+                    <button id="hint-btn" class="btn btn-small">
+                        <i class="fas fa-lightbulb"></i> Hint
+                    </button>
+                    <button id="analyze-btn" class="btn btn-small">
+                        <i class="fas fa-brain"></i> Analyze
+                    </button>
+                </div>
             </div>
 
             <div class="sidebar right-sidebar">
@@ -67,71 +102,265 @@
                     <h3><i class="fas fa-chess-king"></i> Black</h3>
                     <div class="player-clock" id="black-clock">15:00</div>
                     <div class="captured-pieces" id="black-captured"></div>
+                    <div class="player-stats">
+                        <div class="stat">
+                            <span class="stat-label">Material:</span>
+                            <span class="stat-value" id="black-material">39</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Moves:</span>
+                            <span class="stat-value" id="black-moves">0</span>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="game-features">
-                    <h3><i class="fas fa-cogs"></i> Settings</h3>
+                <div class="game-settings">
+                    <h4><i class="fas fa-cogs"></i> Game Settings</h4>
+                    
                     <div class="setting-group">
-                        <label for="game-mode">Game Mode:</label>
+                        <label for="game-mode">Opponent:</label>
                         <select id="game-mode">
                             <option value="player-vs-player">Player vs Player</option>
-                            <option value="player-vs-computer">Player vs Computer (Coming Soon)</option>
+                            <option value="player-vs-ai">Player vs AI (Easy)</option>
+                            <option value="player-vs-ai-medium">Player vs AI (Medium)</option>
+                            <option value="player-vs-ai-hard">Player vs AI (Hard)</option>
+                            <option value="ai-vs-ai">AI vs AI (Watch)</option>
                         </select>
                     </div>
+                    
                     <div class="setting-group">
                         <label for="time-control">Time Control:</label>
                         <select id="time-control">
-                            <option value="15">15 minutes</option>
-                            <option value="10">10 minutes</option>
-                            <option value="5">5 minutes</option>
+                            <option value="1">1 minute</option>
                             <option value="3">3 minutes</option>
-                            <option value="0">No time limit</option>
+                            <option value="5">5 minutes</option>
+                            <option value="10">10 minutes</option>
+                            <option value="15" selected>15 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="0">No limit</option>
                         </select>
                     </div>
-                    <div class="piece-theme">
-                        <h4>Piece Style</h4>
-                        <div class="theme-options">
-                            <button class="theme-btn active" data-theme="classic">Classic</button>
-                            <button class="theme-btn" data-theme="modern">Modern</button>
-                        </div>
+                    
+                    <div class="setting-group">
+                        <label class="switch">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider"></span>
+                            <span class="switch-label">Sound Effects</span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="switch">
+                            <input type="checkbox" id="highlight-toggle" checked>
+                            <span class="slider"></span>
+                            <span class="switch-label">Move Highlight</span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label class="switch">
+                            <input type="checkbox" id="auto-save-toggle" checked>
+                            <span class="slider"></span>
+                            <span class="switch-label">Auto Save</span>
+                        </label>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="save-game" class="btn btn-small">
+                            <i class="fas fa-save"></i> Save Game
+                        </button>
+                        <button id="load-game" class="btn btn-small">
+                            <i class="fas fa-folder-open"></i> Load Game
+                        </button>
+                        <button id="export-pgn" class="btn btn-small">
+                            <i class="fas fa-download"></i> Export PGN
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="notation-panel">
+                    <h4><i class="fas fa-scroll"></i> Algebraic Notation</h4>
+                    <div id="algebraic-notation"></div>
+                    <div class="notation-controls">
+                        <button id="copy-notation" class="btn btn-tiny">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button id="clear-notation" class="btn btn-tiny">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="ai-thinking" id="ai-thinking">
+                    <h4><i class="fas fa-robot"></i> AI Thinking...</h4>
+                    <div class="thinking-dots">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <div class="ai-info">
+                        <div>Depth: <span id="ai-depth">3</span></div>
+                        <div>Nodes: <span id="ai-nodes">0</span></div>
+                        <div>Best: <span id="ai-best-move">e4</span></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="game-rules">
-            <h3><i class="fas fa-book"></i> Chess Rules</h3>
-            <ul>
-                <li>Click a piece to select it, then click a destination square to move</li>
-                <li>White always moves first</li>
-                <li>Checkmate ends the game</li>
-                <li>Castle by moving the king two squares toward a rook</li>
-                <li>Pawns promote to any piece when reaching the opposite side</li>
-            </ul>
+        <div class="game-features">
+            <div class="feature">
+                <i class="fas fa-chess-queen"></i>
+                <h4>En Passant</h4>
+                <p>Special pawn capture rule implemented</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-chess-rook"></i>
+                <h4>Castling</h4>
+                <p>King & rook special move available</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-robot"></i>
+                <h4>AI Opponent</h4>
+                <p>3 difficulty levels</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-music"></i>
+                <h4>Sound Effects</h4>
+                <p>Immersive gameplay sounds</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-save"></i>
+                <h4>Auto Save</h4>
+                <p>Never lose your game</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-chart-line"></i>
+                <h4>Analysis</h4>
+                <p>Game evaluation bar</p>
+            </div>
         </div>
 
         <footer>
-            <p>Made with <i class="fas fa-heart"></i> | Deployable on Vercel</p>
+            <p>Enhanced Chess v2.0 | Made with <i class="fas fa-heart"></i> | Deployable on Vercel</p>
             <div class="footer-links">
-                <a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub</a>
-                <a href="#" id="rules-link"><i class="fas fa-question-circle"></i> How to Play</a>
+                <a href="#" id="toggle-rules"><i class="fas fa-book"></i> Game Rules</a>
+                <a href="#" id="toggle-shortcuts"><i class="fas fa-keyboard"></i> Shortcuts</a>
+                <a href="#" id="toggle-about"><i class="fas fa-info-circle"></i> About</a>
             </div>
         </footer>
     </div>
 
+    <!-- Promotion Modal -->
     <div id="promotion-modal" class="modal">
         <div class="modal-content">
-            <h3>Pawn Promotion</h3>
+            <h3><i class="fas fa-chess-queen"></i> Pawn Promotion</h3>
             <p>Choose a piece to promote your pawn to:</p>
             <div class="promotion-options">
-                <div class="promotion-piece" data-piece="queen">♕ Queen</div>
-                <div class="promotion-piece" data-piece="rook">♖ Rook</div>
-                <div class="promotion-piece" data-piece="bishop">♗ Bishop</div>
-                <div class="promotion-piece" data-piece="knight">♘ Knight</div>
+                <div class="promotion-piece" data-piece="queen">
+                    <i class="fas fa-chess-queen"></i>
+                    <span>Queen</span>
+                </div>
+                <div class="promotion-piece" data-piece="rook">
+                    <i class="fas fa-chess-rook"></i>
+                    <span>Rook</span>
+                </div>
+                <div class="promotion-piece" data-piece="bishop">
+                    <i class="fas fa-chess-bishop"></i>
+                    <span>Bishop</span>
+                </div>
+                <div class="promotion-piece" data-piece="knight">
+                    <i class="fas fa-chess-knight"></i>
+                    <span>Knight</span>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Keyboard Shortcuts Modal -->
+    <div id="shortcuts-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h3>
+            <div class="shortcuts-grid">
+                <div class="shortcut">
+                    <kbd>Space</kbd>
+                    <span>Flip Board</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>Z</kbd>
+                    <span>Undo Move</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>H</kbd>
+                    <span>Show Hint</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>N</kbd>
+                    <span>New Game</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>F</kbd>
+                    <span>Flip Board</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>S</kbd>
+                    <span>Save Game</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>L</kbd>
+                    <span>Load Game</span>
+                </div>
+                <div class="shortcut">
+                    <kbd>M</kbd>
+                    <span>Toggle Sound</span>
+                </div>
+            </div>
+            <button class="btn close-modal">Close</button>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-info-circle"></i> About Enhanced Chess</h3>
+            <p>Version 2.0 with advanced features:</p>
+            <ul>
+                <li>Complete chess rules (en passant, castling)</li>
+                <li>AI opponent with 3 difficulty levels</li>
+                <li>Sound effects and visual feedback</li>
+                <li>Auto-save and game import/export</li>
+                <li>Algebraic notation and PGN export</li>
+                <li>Game analysis and evaluation</li>
+                <li>Responsive design for all devices</li>
+                <li>Vercel deployment ready</li>
+            </ul>
+            <p class="tech-stack">
+                <strong>Tech Stack:</strong> HTML5, CSS3, JavaScript (ES6+), Minimax Algorithm
+            </p>
+            <button class="btn close-modal">Close</button>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="move-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-chess-tile-move-1519.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="capture-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-chess-capture-1520.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="check-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-sword-hit-2780.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="castle-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-magic-spell-909.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="promote-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="hint-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-ball-tap-2073.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html> 
